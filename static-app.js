@@ -4,7 +4,7 @@ import {
   composeGroundedAnswer,
   retrieve,
 } from "./lib/knowledge.js";
-import { mountLivingPortrait } from "./lib/living-portrait.js";
+import { mountMira3D } from "./lib/mira-3d.js";
 import { SAMPLES } from "./lib/samples.js";
 
 const ENERGY = {
@@ -31,6 +31,7 @@ const state = {
   audio: null,
   voices: [],
 };
+let mira3d = null;
 
 const panels = {
   knowledge: $("#knowledgePanel"),
@@ -89,16 +90,24 @@ function refreshVoices() {
   state.voices = window.speechSynthesis?.getVoices?.() || [];
 }
 
-function stopVoice() {
-  window.speechSynthesis?.cancel();
-  state.speaking = false;
-  $("#appShell").classList.remove("is-speaking");
-  $("#voiceBars").classList.remove("active");
+function setSpeaking(active, status = null) {
+  state.speaking = active;
+  $("#appShell").classList.toggle("is-speaking", active);
+  $("#voiceBars").classList.toggle("active", active);
+  if (status) setStatus(status);
 }
 
-function speak(text) {
-  if (state.quiet || !("speechSynthesis" in window)) return;
-  stopVoice();
+function stopVoice() {
+  window.speechSynthesis?.cancel();
+  mira3d?.stop?.();
+  setSpeaking(false);
+}
+
+function speakWithBrowser(text) {
+  if (!("speechSynthesis" in window)) {
+    setStatus("Voice unavailable");
+    return;
+  }
   const utterance = new SpeechSynthesisUtterance(text);
   const matches = state.voices.filter((voice) =>
     voice.lang.toLowerCase().startsWith(state.locale.slice(0, 2).toLowerCase()),
@@ -114,29 +123,41 @@ function speak(text) {
   utterance.pitch = state.locale.startsWith("zh") ? 0.94 : 0.9;
   utterance.volume = 0.86;
   utterance.onstart = () => {
-    state.speaking = true;
-    $("#appShell").classList.add("is-speaking");
-    $("#voiceBars").classList.add("active");
-    setStatus("speaking softly");
+    setSpeaking(true, "Speaking softly · browser voice");
   };
   utterance.onend = () => {
-    state.speaking = false;
-    $("#appShell").classList.remove("is-speaking");
-    $("#voiceBars").classList.remove("active");
-    setStatus("Ready");
+    setSpeaking(false, "Ready");
   };
   utterance.onerror = () => {
-    state.speaking = false;
-    $("#appShell").classList.remove("is-speaking");
-    $("#voiceBars").classList.remove("active");
-    setStatus("Voice unavailable");
+    setSpeaking(false, "Voice unavailable");
   };
   window.speechSynthesis.speak(utterance);
+}
+
+async function speak(text) {
+  if (state.quiet) return;
+  stopVoice();
+
+  if (state.locale.toLowerCase().startsWith("en")) {
+    try {
+      await mira3d?.speak?.(text, {
+        locale: state.locale,
+        rate: ENERGY[state.energy].rate,
+      });
+      return;
+    } catch (error) {
+      console.warn("Local neural voice unavailable; using browser voice.", error);
+      setStatus("Using browser voice fallback");
+    }
+  }
+
+  speakWithBrowser(text);
 }
 
 function ask(question) {
   const cleanQuestion = question.trim();
   if (!cleanQuestion) return;
+  void mira3d?.resume?.();
   stopVoice();
   clearError();
   $("#questionInput").value = "";
@@ -406,6 +427,7 @@ async function toggleBrownNoise() {
 
 function startListening() {
   clearError();
+  void mira3d?.resume?.();
   if (state.listening) {
     state.recognition?.stop?.();
     return;
@@ -428,6 +450,7 @@ function startListening() {
 
   recognition.onstart = () => {
     state.listening = true;
+    mira3d?.setListening?.(true);
     $("#appShell").classList.add("is-listening");
     $("#micButton").classList.add("listening");
     $("#questionInput").placeholder = "I’m listening…";
@@ -444,6 +467,8 @@ function startListening() {
     $("#interimText").hidden = false;
   };
   recognition.onerror = (event) => {
+    state.listening = false;
+    mira3d?.setListening?.(false);
     $("#appShell").classList.remove("is-listening");
     showError(
       event.error === "not-allowed"
@@ -453,6 +478,7 @@ function startListening() {
   };
   recognition.onend = () => {
     state.listening = false;
+    mira3d?.setListening?.(false);
     $("#appShell").classList.remove("is-listening");
     $("#micButton").classList.remove("listening");
     $("#questionInput").placeholder = "Ask from your knowledge…";
@@ -462,12 +488,29 @@ function startListening() {
   recognition.start();
 }
 
-mountLivingPortrait(
-  $("#miraPortrait"),
-  "./public/assets/mira-study.webp",
-);
+let avatarReady = false;
+mira3d = mountMira3D($("#miraAvatar"), {
+  avatarUrl: "./public/assets/mira-3d.glb",
+  onStatus: (message) => {
+    setStatus(message);
+    if (!avatarReady) $("#avatarLoader").textContent = message;
+  },
+  onReady: () => {
+    avatarReady = true;
+    $("#avatarLoader").hidden = true;
+  },
+  onSpeakingChange: (active) =>
+    setSpeaking(active, active ? "Speaking softly · phoneme lip sync" : null),
+  onError: (message) => {
+    $("#avatarLoader").hidden = true;
+    showError(
+      `Mira’s 3D/neural mode could not start (${message}). The static portrait and browser voice still work.`,
+    );
+  },
+});
 
 function beginIdea() {
+  void mira3d?.resume?.();
   const firstChunk = chunkKnowledge(state.knowledge.text)[0]?.content;
   if (!firstChunk) return;
   const intro = state.locale.startsWith("zh")
@@ -546,6 +589,7 @@ renderSamples();
 
 window.addEventListener("beforeunload", () => {
   stopVoice();
+  void mira3d?.destroy?.();
   state.recognition?.abort?.();
   if (state.audio) {
     state.audio.source.stop();

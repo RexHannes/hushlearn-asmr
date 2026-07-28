@@ -1,19 +1,21 @@
 # Hushlearn
 
-Hushlearn is a calm, avatar-led learning room grounded in material the learner
-selects. The hosted demo is deliberately browser-first: it works without an API
-key, keeps uploaded text in the current tab, and can be served as a static site.
+Hushlearn is a calm, 3D-avatar-led learning room grounded in material the
+learner selects. The hosted demo is browser-first: it works without an API key,
+keeps uploaded text in the current tab, and can be served as a static site.
 
 **Live demo:** <https://rexhannes.github.io/hushlearn-asmr/>
 
 ## What works now
 
-- Original, photorealistic adult educator with subtle speaking/idle animation
+- Real-time 3D adult educator with blinking, gaze, and natural idle/head motion
+- Phoneme-timed facial blendshape lip sync for English answers
+- Local Kokoro neural speech through HeadTTS after a one-time model download
 - Typed questions and microphone questions in supported browsers
 - Local ingestion of TXT, Markdown, CSV, JSON, and HTML files
 - English and CJK-aware passage retrieval
 - Answers assembled from matching source passages, with visible citations
-- Browser text-to-speech with English, Cantonese, and Mandarin voice selection
+- Browser-voice fallback for Cantonese, Mandarin, or unsupported neural speech
 - Interruption: starting the microphone cancels the current spoken answer
 - Drained, steady, and focused speaking modes
 - Locally generated brown-noise ambience
@@ -22,19 +24,23 @@ key, keeps uploaded text in the current tab, and can be served as a static site.
 
 ## Important reality check
 
-The free public build animates Mira in real time with a dependency-free canvas
-renderer: breathing/head movement, an attentive listening pose, and mouth motion
-while browser speech is active. It does **not** pretend to be
-frame-by-frame neural lip sync or a fully local large language model. A true
-talking-video pipeline requires the optional GPU services described in
-[GPU_UPGRADE.md](./GPU_UPGRADE.md).
+The free public build uses
+[TalkingHead](https://github.com/met4citizen/TalkingHead) for the rigged Three.js
+avatar and [HeadTTS](https://github.com/met4citizen/HeadTTS) for in-browser
+English neural speech with phoneme/viseme timestamps. The face is genuinely
+animated through 3D morph targets; the page is not moved or shaken.
+
+This is still a stylized 3D avatar, not photorealistic generated video, and the
+lightweight grounded answer composer is not a local large language model. A
+photorealistic talking-video or full local speech-to-speech pipeline requires
+the optional GPU services described in [GPU_UPGRADE.md](./GPU_UPGRADE.md).
 
 Hushlearn is an educational host, not a simulated romantic partner. The visual
 identity is fictional and the interface is designed for professional learning.
 
 ## Run locally
 
-The static build has no dependencies:
+The static build uses pinned browser modules from jsDelivr:
 
 ```bash
 python3 -m http.server 4173
@@ -51,7 +57,7 @@ npm run dev
 ```
 
 `npm run build` produces the Cloudflare Worker-compatible vinext bundle.
-`npm run build:static` packages the dependency-free public demo into `dist/`.
+`npm run build:static` packages the public demo into `dist/`.
 
 ## How grounding works
 
@@ -66,16 +72,19 @@ replacement for a production embedding model or a source-grounded LLM.
 
 ## Browser support
 
-Typed questions, local retrieval, and brown noise work in current evergreen
-browsers. Browser speech recognition is most reliable in Chrome and Edge and may
-use the browser vendor's speech service. Available text-to-speech voices depend
-on the operating system and browser.
+Typed questions, local retrieval, 3D rendering, and brown noise work in current
+evergreen browsers with WebGL. The English neural voice prefers WebGPU and falls
+back to WASM; its first use downloads model files and can take tens of seconds.
+Browser speech recognition is most reliable in Chrome and Edge and may use the
+browser vendor's speech service. Chinese output currently uses an installed
+browser voice.
 
 ## Repository map
 
-- `index.html` / `static-app.js` — dependency-free public demo
+- `index.html` / `static-app.js` — static public demo
 - `app/` / `components/` — experimental Next.js interface
 - `lib/knowledge.js` — local chunking, CJK-aware retrieval, grounded response
+- `lib/mira-3d.js` — TalkingHead + HeadTTS lifecycle and interruption adapter
 - `lib/knowledge.test.mjs` — retrieval tests
 - `public/assets/` — original generated host portraits
 - `GPU_UPGRADE.md` — local speech-to-speech and neural-avatar plan
@@ -95,5 +104,7 @@ console-error monitoring.
 
 ## License
 
-Code is MIT licensed. The original Mira portrait is separately licensed under
-CC BY 4.0; see [ASSET_LICENSE.md](./ASSET_LICENSE.md).
+Code is MIT licensed. The fallback portrait is separately licensed under CC BY
+4.0; see [ASSET_LICENSE.md](./ASSET_LICENSE.md). The Ready Player Me 3D example
+avatar is CC BY-NC 4.0 and therefore non-commercial only. See
+[THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).

@@ -1,6 +1,8 @@
 .next
 dist
 node_modules
+.wrangler
+next-env.d.ts
 .DS_Store
 *.log
 .env*

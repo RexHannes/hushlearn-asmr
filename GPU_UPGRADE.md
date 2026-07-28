@@ -1,10 +1,11 @@
 # GPU upgrade path
 
-The free Hushlearn demo is intentionally browser-first. It uses a lightweight
-canvas living-portrait renderer for breathing, listening, and speaking motion.
-This document defines a replaceable backend for neural portrait animation
-and a fully local or GPU-hosted voice pipeline without coupling the interface to
-one vendor.
+The free Hushlearn demo is intentionally browser-first. It already uses a
+rigged Three.js character for natural idle movement and timed viseme lip sync,
+plus local in-browser English neural speech. This document defines a replaceable
+backend for a more photorealistic neural-video character and a fully local or
+GPU-hosted multilingual speech pipeline without coupling the interface to one
+vendor.
 
 ## Target pipeline
 

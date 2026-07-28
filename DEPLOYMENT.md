@@ -2,12 +2,14 @@
 
 ## Current public build
 
-The root of this repository is a dependency-free static site. GitHub Pages can
-serve it directly from the `main` branch:
+The root of this repository is a static site. GitHub Pages can serve it directly
+from the `main` branch:
 
 <https://rexhannes.github.io/hushlearn-asmr/>
 
-No environment variables or secrets are required.
+No environment variables or secrets are required. The browser loads pinned
+TalkingHead, HeadTTS, and Three.js modules from jsDelivr. The English neural
+voice downloads its model and voice data on first use.
 
 ## Local preview
 
@@ -23,8 +25,8 @@ Do not double-click `index.html`: browsers commonly block ES module imports from
 ## Cache policy
 
 The demo does not use a service worker, so a refresh always checks the host for
-the latest files. Host portraits are compressed WebP assets and can be cached by
-the CDN.
+the latest files. The fallback portraits and 3D GLB asset can be cached by the
+CDN; the browser/runtime manages the neural voice model cache.
 
 ## Optional API/GPU deployment
 

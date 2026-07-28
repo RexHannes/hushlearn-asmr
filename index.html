@@ -22,7 +22,10 @@
           />
           <img src="./public/assets/mira-study.webp" alt="" />
         </picture>
-        <canvas class="living-portrait" id="miraPortrait"></canvas>
+        <div class="mira-3d" id="miraAvatar"></div>
+        <div class="avatar-loader" id="avatarLoader">
+          Loading open-source 3D Mira…
+        </div>
         <div class="host-light"></div>
       </div>
       <div class="scene-shade"></div>
@@ -111,7 +114,7 @@
           <span class="live-dot"></span>
           <span>
             <strong>Mira</strong>
-            <small>living portrait · local browser animation</small>
+            <small>real-time 3D · neural viseme lip sync</small>
           </span>
         </div>
       </section>
@@ -167,7 +170,7 @@
         </form>
         <div class="dock-caption">
           <span>✓ Knowledge files are processed locally</span>
-          <span>Browser speech may use your browser provider</span>
+          <span>English neural voice runs locally after its first download</span>
         </div>
       </section>
 
@@ -257,7 +260,7 @@
               <span aria-hidden="true">◖</span>
               <span>
                 <strong>Speaking language</strong>
-                <small>Uses a matching voice installed in your browser</small>
+                <small>Local neural English; browser fallback for Chinese</small>
               </span>
             </div>
             <select id="languageSelect">
@@ -309,7 +312,7 @@
           <p>
             Hushlearn is a browser-first prototype: a calm digital educator
             grounded in material you select. The free build uses local retrieval,
-            browser speech, and subtle portrait animation.
+            a real-time Three.js avatar, and phoneme-timed in-browser neural speech.
           </p>
           <div class="capability-list">
             <span>✓ Typed and microphone questions</span>
@@ -320,9 +323,10 @@
           <div class="reality-note">
             <span aria-hidden="true">ⓘ</span>
             <p>
-              This free demo animates a still original portrait. True
-              frame-by-frame lip synchronization requires the optional GPU adapter
-              described in the project documentation.
+              English answers use actual 3D facial blendshapes driven by
+              phoneme/viseme timestamps. The first answer downloads the neural
+              voice model; Chinese currently uses the browser voice fallback.
+              Mira remains visibly AI-generated.
             </p>
           </div>
         </div>

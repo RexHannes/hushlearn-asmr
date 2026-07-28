@@ -29,7 +29,7 @@ import {
   composeGroundedAnswer,
   retrieve,
 } from "../lib/knowledge";
-import { mountLivingPortrait } from "../lib/living-portrait";
+import { mountMira3D } from "../lib/mira-3d";
 import { SAMPLES } from "../lib/samples";
 
 const ENERGY = {
@@ -123,12 +123,25 @@ export default function Hushlearn() {
   const recognitionRef = useRef(null);
   const audioRef = useRef(null);
   const messageEndRef = useRef(null);
-  const miraPortraitRef = useRef(null);
+  const miraAvatarRef = useRef(null);
+  const mira3dRef = useRef(null);
 
-  useEffect(
-    () => mountLivingPortrait(miraPortraitRef.current, "/assets/mira-study.webp"),
-    [],
-  );
+  useEffect(() => {
+    const controller = mountMira3D(miraAvatarRef.current, {
+      avatarUrl: "/assets/mira-3d.glb",
+      onStatus: setStatus,
+      onSpeakingChange: (active) => setSpeaking(active),
+      onError: (message) =>
+        setError(
+          `Mira’s 3D/neural mode could not start (${message}). The static portrait and browser voice still work.`,
+        ),
+    });
+    mira3dRef.current = controller;
+    return () => {
+      if (mira3dRef.current === controller) mira3dRef.current = null;
+      void controller.destroy();
+    };
+  }, []);
 
   const knowledgeIndex = useMemo(
     () => buildIndex(knowledge.text),
@@ -199,13 +212,35 @@ export default function Hushlearn() {
 
   const stopVoice = useCallback(() => {
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    mira3dRef.current?.stop?.();
     setSpeaking(false);
   }, []);
 
   const speak = useCallback(
-    (text) => {
-      if (quietMode || !("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
+    async (text) => {
+      if (quietMode) return;
+      stopVoice();
+
+      if (locale.toLowerCase().startsWith("en") && mira3dRef.current) {
+        try {
+          await mira3dRef.current.speak(text, {
+            locale,
+            rate: ENERGY[energy].rate,
+          });
+          return;
+        } catch (voiceError) {
+          console.warn(
+            "Local neural voice unavailable; using browser voice.",
+            voiceError,
+          );
+          setStatus("Using browser voice fallback");
+        }
+      }
+
+      if (!("speechSynthesis" in window)) {
+        setStatus("Voice unavailable");
+        return;
+      }
       const utterance = new SpeechSynthesisUtterance(text);
       const matchingVoices = voices.filter((voice) =>
         voice.lang.toLocaleLowerCase().startsWith(locale.slice(0, 2).toLocaleLowerCase()),
@@ -221,7 +256,7 @@ export default function Hushlearn() {
       utterance.volume = 0.86;
       utterance.onstart = () => {
         setSpeaking(true);
-        setStatus("Speaking softly");
+        setStatus("Speaking softly · browser voice");
       };
       utterance.onend = () => {
         setSpeaking(false);
@@ -233,13 +268,14 @@ export default function Hushlearn() {
       };
       window.speechSynthesis.speak(utterance);
     },
-    [energy, locale, quietMode, voices],
+    [energy, locale, quietMode, stopVoice, voices],
   );
 
   const ask = useCallback(
     (question) => {
       const cleanQuestion = question.trim();
       if (!cleanQuestion) return;
+      void mira3dRef.current?.resume?.();
       stopVoice();
       setError("");
       setDraft("");
@@ -267,6 +303,7 @@ export default function Hushlearn() {
 
   const startListening = () => {
     setError("");
+    void mira3dRef.current?.resume?.();
     if (listening) {
       recognitionRef.current?.stop?.();
       setListening(false);
@@ -293,6 +330,7 @@ export default function Hushlearn() {
 
     recognition.onstart = () => {
       setListening(true);
+      mira3dRef.current?.setListening?.(true);
       setStatus("Listening");
     };
     recognition.onresult = (event) => {
@@ -311,10 +349,12 @@ export default function Hushlearn() {
           : `I couldn’t hear that clearly (${event.error}). Please try again or type your question.`;
       setError(message);
       setListening(false);
+      mira3dRef.current?.setListening?.(false);
       setStatus("Ready");
     };
     recognition.onend = () => {
       setListening(false);
+      mira3dRef.current?.setListening?.(false);
       setStatus("Ready");
       if (finalTranscript.trim()) ask(finalTranscript);
     };
@@ -433,6 +473,7 @@ export default function Hushlearn() {
   };
 
   const beginIdea = () => {
+    void mira3dRef.current?.resume?.();
     const firstChunk = chunkKnowledge(knowledge.text)[0]?.content;
     if (!firstChunk) return;
     const intro = locale.startsWith("zh")
@@ -470,7 +511,8 @@ export default function Hushlearn() {
           />
           <img src="/assets/mira-study.webp" alt="" />
         </picture>
-        <canvas className="living-portrait" ref={miraPortraitRef} />
+        <div className="mira-3d" ref={miraAvatarRef} />
+        <div className="avatar-loader">Loading open-source 3D Mira…</div>
         <div className="host-light" />
       </div>
       <div className="scene-shade" />
@@ -566,7 +608,7 @@ export default function Hushlearn() {
           <span className="live-dot" />
           <span>
             <strong>Mira</strong>
-            <small>living portrait · local browser animation</small>
+            <small>real-time 3D · neural viseme lip sync</small>
           </span>
         </div>
       </section>
@@ -642,7 +684,7 @@ export default function Hushlearn() {
             <ShieldCheck size={12} />
             Knowledge files are processed locally
           </span>
-          <span>Browser speech may use your browser provider</span>
+          <span>English neural voice runs locally after its first download</span>
         </div>
       </section>
 
@@ -796,7 +838,7 @@ export default function Hushlearn() {
                     <Headphones size={18} />
                     <span>
                       <strong>Speaking language</strong>
-                      <small>Uses a matching voice installed in your browser</small>
+                      <small>Local neural English; browser fallback for Chinese</small>
                     </span>
                   </div>
                   <select value={locale} onChange={(event) => setLocale(event.target.value)}>
@@ -864,7 +906,8 @@ export default function Hushlearn() {
                 <p>
                   Hushlearn is a browser-first prototype: a calm digital educator
                   grounded in material you select. The free build uses local
-                  retrieval, browser speech, and subtle portrait animation.
+                  retrieval, a real-time Three.js avatar, and phoneme-timed
+                  in-browser neural speech.
                 </p>
                 <div className="capability-list">
                   <span>
@@ -883,9 +926,10 @@ export default function Hushlearn() {
                 <div className="reality-note">
                   <Info size={18} />
                   <p>
-                    This free demo animates a still original portrait. True
-                    frame-by-frame lip synchronization requires the optional GPU
-                    adapter described in the project documentation.
+                    English answers use actual 3D facial blendshapes driven by
+                    phoneme/viseme timestamps. The first answer downloads the
+                    neural voice model; Chinese currently uses the browser voice
+                    fallback. Mira remains visibly AI-generated.
                   </p>
                 </div>
               </div>
