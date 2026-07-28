@@ -1,8 +1,10 @@
 # GPU upgrade path
 
-The free Hushlearn demo is intentionally static and browser-first. This document
-defines a replaceable backend for a more lifelike, fully local or GPU-hosted
-version without coupling the user interface to one vendor.
+The free Hushlearn demo is intentionally browser-first. It uses a lightweight
+canvas living-portrait renderer for breathing, listening, and speaking motion.
+This document defines a replaceable backend for neural portrait animation
+and a fully local or GPU-hosted voice pipeline without coupling the interface to
+one vendor.
 
 ## Target pipeline
 
@@ -17,7 +19,7 @@ retrieval + llama.cpp
    ↓
 Qwen3-TTS
    ↓
-MuseTalk / LiveTalking
+LivePortrait / MuseTalk / LiveTalking
    ↓
 WebRTC audio + video
 ```
@@ -28,6 +30,7 @@ Recommended upstream projects:
 - [whisper.cpp](https://github.com/ggml-org/whisper.cpp) for local transcription
 - [llama.cpp](https://github.com/ggml-org/llama.cpp) for a local grounded model
 - [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS) for expressive multilingual speech
+- [LivePortrait](https://github.com/KlingAIResearch/LivePortrait) for portrait motion and retargeting
 - [MuseTalk](https://github.com/TMElyralab/MuseTalk) for neural lip synchronization
 - [LiveTalking](https://github.com/lipku/LiveTalking) for interactive streaming
 

@@ -29,6 +29,7 @@ import {
   composeGroundedAnswer,
   retrieve,
 } from "../lib/knowledge";
+import { mountLivingPortrait } from "../lib/living-portrait";
 import { SAMPLES } from "../lib/samples";
 
 const ENERGY = {
@@ -122,6 +123,12 @@ export default function Hushlearn() {
   const recognitionRef = useRef(null);
   const audioRef = useRef(null);
   const messageEndRef = useRef(null);
+  const miraPortraitRef = useRef(null);
+
+  useEffect(
+    () => mountLivingPortrait(miraPortraitRef.current, "/assets/mira-study.webp"),
+    [],
+  );
 
   const knowledgeIndex = useMemo(
     () => buildIndex(knowledge.text),
@@ -452,15 +459,18 @@ export default function Hushlearn() {
   };
 
   return (
-    <main className={`app-shell ${speaking ? "is-speaking" : ""}`}>
+    <main
+      className={`app-shell ${speaking ? "is-speaking" : ""} ${listening ? "is-listening" : ""}`}
+    >
       <div className="host-scene" aria-hidden="true">
-        <picture>
+        <picture className="portrait-fallback">
           <source
             media="(max-width: 720px)"
             srcSet="/assets/mira-study-small.webp"
           />
           <img src="/assets/mira-study.webp" alt="" />
         </picture>
+        <canvas className="living-portrait" ref={miraPortraitRef} />
         <div className="host-light" />
       </div>
       <div className="scene-shade" />
@@ -556,7 +566,7 @@ export default function Hushlearn() {
           <span className="live-dot" />
           <span>
             <strong>Mira</strong>
-            <small>learning guide · original digital host</small>
+            <small>living portrait · local browser animation</small>
           </span>
         </div>
       </section>

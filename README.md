@@ -22,10 +22,12 @@ key, keeps uploaded text in the current tab, and can be served as a static site.
 
 ## Important reality check
 
-The free public build animates a still original portrait and uses the browser's
-speech services. It does **not** pretend to be frame-by-frame neural lip sync or
-a fully local large language model. A true talking-video pipeline requires the
-optional GPU services described in [GPU_UPGRADE.md](./GPU_UPGRADE.md).
+The free public build animates Mira in real time with a dependency-free canvas
+renderer: breathing/head movement, an attentive listening pose, and mouth motion
+while browser speech is active. It does **not** pretend to be
+frame-by-frame neural lip sync or a fully local large language model. A true
+talking-video pipeline requires the optional GPU services described in
+[GPU_UPGRADE.md](./GPU_UPGRADE.md).
 
 Hushlearn is an educational host, not a simulated romantic partner. The visual
 identity is fictional and the interface is designed for professional learning.

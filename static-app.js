@@ -4,6 +4,7 @@ import {
   composeGroundedAnswer,
   retrieve,
 } from "./lib/knowledge.js";
+import { mountLivingPortrait } from "./lib/living-portrait.js";
 import { SAMPLES } from "./lib/samples.js";
 
 const ENERGY = {
@@ -427,6 +428,7 @@ function startListening() {
 
   recognition.onstart = () => {
     state.listening = true;
+    $("#appShell").classList.add("is-listening");
     $("#micButton").classList.add("listening");
     $("#questionInput").placeholder = "I’m listening…";
     setStatus("Listening");
@@ -442,6 +444,7 @@ function startListening() {
     $("#interimText").hidden = false;
   };
   recognition.onerror = (event) => {
+    $("#appShell").classList.remove("is-listening");
     showError(
       event.error === "not-allowed"
         ? "Microphone permission was denied. Enable it in the address bar, or type instead."
@@ -450,6 +453,7 @@ function startListening() {
   };
   recognition.onend = () => {
     state.listening = false;
+    $("#appShell").classList.remove("is-listening");
     $("#micButton").classList.remove("listening");
     $("#questionInput").placeholder = "Ask from your knowledge…";
     setStatus("Ready");
@@ -457,6 +461,11 @@ function startListening() {
   };
   recognition.start();
 }
+
+mountLivingPortrait(
+  $("#miraPortrait"),
+  "./public/assets/mira-study.webp",
+);
 
 function beginIdea() {
   const firstChunk = chunkKnowledge(state.knowledge.text)[0]?.content;
