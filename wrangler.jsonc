@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hushlearn-mira",
+  "compatibility_date": "2026-07-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./worker/index.js",
+  "preview_urls": true,
+  "assets": {
+    "not_found_handling": "none",
+    "binding": "ASSETS"
+  }
+}

@@ -41,6 +41,13 @@ a separate HTTPS endpoint. Configure that endpoint with:
 
 See [GPU_UPGRADE.md](./GPU_UPGRADE.md) for the adapter contract.
 
+## Managed Sites build
+
+The App Router source also builds through
+[vinext](https://github.com/cloudflare/vinext), using the Cloudflare Vite plugin.
+`npm run build` emits the required Worker entrypoint under `dist/server/` and
+copies `.openai/hosting.json` into the deployable artifact.
+
 ## Rollback
 
 GitHub Pages deploys the selected repository branch. To roll back, revert the

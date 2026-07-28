@@ -40,16 +40,16 @@ python3 -m http.server 4173
 
 Then open <http://localhost:4173/>.
 
-The repository also includes an experimental Next.js source tree for the future
-server/GPU adapter:
+The repository also includes a vinext-compatible App Router source tree for the
+managed Sites deployment and future server/GPU adapter:
 
 ```bash
 npm install
 npm run dev
 ```
 
-`npm run build` packages the dependency-free public demo into `dist/` for static
-cloud hosting. Use `npm run build:next` to compile the experimental Next.js app.
+`npm run build` produces the Cloudflare Worker-compatible vinext bundle.
+`npm run build:static` packages the dependency-free public demo into `dist/`.
 
 ## How grounding works
 
