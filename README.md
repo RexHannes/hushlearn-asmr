@@ -48,6 +48,9 @@ npm install
 npm run dev
 ```
 
+`npm run build` packages the dependency-free public demo into `dist/` for static
+cloud hosting. Use `npm run build:next` to compile the experimental Next.js app.
+
 ## How grounding works
 
 1. Text is cleaned and split into bounded passages.
