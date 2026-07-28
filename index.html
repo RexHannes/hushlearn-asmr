@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A private, browser-first ASMR learning companion grounded in your selected knowledge base."
+    />
+    <meta name="theme-color" content="#071019" />
+    <title>Hushlearn — quiet knowledge, spoken gently</title>
+    <link rel="icon" href="./public/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./app/globals.css" />
+  </head>
+  <body>
+    <main class="app-shell" id="appShell">
+      <div class="host-scene" aria-hidden="true">
+        <picture>
+          <source
+            media="(max-width: 720px)"
+            srcset="./public/assets/mira-study-small.webp"
+          />
+          <img src="./public/assets/mira-study.webp" alt="" />
+        </picture>
+        <div class="host-light"></div>
+      </div>
+      <div class="scene-shade"></div>
+      <div class="grain"></div>
+
+      <header class="topbar">
+        <button class="brand" id="aboutButton" aria-label="About Hushlearn">
+          <span class="brand-mark" aria-hidden="true">☾</span>
+          <span>
+            <strong>Hushlearn</strong>
+            <small>quiet knowledge, spoken gently</small>
+          </span>
+        </button>
+        <div class="top-actions">
+          <span class="privacy-pill">
+            <span aria-hidden="true">✓</span>
+            Files stay in this tab
+          </span>
+          <button class="icon-button" id="knowledgeButton" aria-label="Open knowledge studio">
+            <span aria-hidden="true">▤</span>
+          </button>
+          <button class="icon-button" id="settingsButton" aria-label="Open settings">
+            <span aria-hidden="true">☷</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="lesson-stage">
+        <div class="lesson-column">
+          <div class="eyebrow">
+            <span class="live-dot"></span>
+            PRIVATE STUDY ROOM
+          </div>
+          <h1>
+            Good evening.
+            <span>What should we learn quietly?</span>
+          </h1>
+
+          <button class="knowledge-card" id="selectedKnowledgeButton">
+            <span class="knowledge-icon" aria-hidden="true">⌑</span>
+            <span>
+              <small>SELECTED KNOWLEDGE</small>
+              <strong id="knowledgeTitle">Sleep &amp; memory</strong>
+              <em id="knowledgeCount">6 grounded passages</em>
+            </span>
+            <span aria-hidden="true">›</span>
+          </button>
+
+          <div class="answer-card" aria-live="polite">
+            <div class="answer-topline">
+              <span class="mira-avatar">M</span>
+              <span>
+                <strong>Mira</strong>
+                <small id="roomStatus">Ready</small>
+              </span>
+              <span class="voice-bars" id="voiceBars" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i>
+              </span>
+            </div>
+            <p id="hostAnswer">
+              Good evening. I’m Mira. Bring me something you want to understand,
+              and we’ll take it one quiet idea at a time.
+            </p>
+            <div class="answer-meta">
+              <span class="confidence confidence-high" id="confidence">
+                <span></span>
+                <b>Strong match</b>
+              </span>
+              <button id="sourcesButton" hidden>View sources</button>
+            </div>
+          </div>
+
+          <div class="starter-row">
+            <button id="teachButton">
+              <span aria-hidden="true">✦</span>
+              Teach me one idea
+            </button>
+            <button id="tryButton">
+              <span aria-hidden="true">◌</span>
+              Try a question
+            </button>
+          </div>
+        </div>
+
+        <div class="host-label">
+          <span class="live-dot"></span>
+          <span>
+            <strong>Mira</strong>
+            <small>learning guide · original digital host</small>
+          </span>
+        </div>
+      </section>
+
+      <aside class="energy-rail" aria-label="Energy mode">
+        <small>YOUR ENERGY</small>
+        <button data-energy="drained"><span></span>Drained</button>
+        <button data-energy="steady" class="active"><span></span>Steady</button>
+        <button data-energy="focused"><span></span>Focused</button>
+      </aside>
+
+      <section class="conversation-dock">
+        <div class="error-toast" id="errorToast" role="alert" hidden>
+          <span aria-hidden="true">ⓘ</span>
+          <span id="errorMessage"></span>
+          <button id="dismissError" aria-label="Dismiss message">×</button>
+        </div>
+        <div class="interim-text" id="interimText" hidden></div>
+        <form class="composer" id="composer">
+          <button
+            type="button"
+            class="ambient-button"
+            id="ambientButton"
+            aria-label="Turn on brown noise"
+            title="Brown noise"
+          >
+            <span aria-hidden="true">≋</span>
+          </button>
+          <input
+            id="questionInput"
+            placeholder="Ask from your knowledge…"
+            aria-label="Ask Mira a question"
+            autocomplete="off"
+          />
+          <button
+            type="button"
+            class="mic-button"
+            id="micButton"
+            aria-label="Ask with microphone"
+          >
+            <span aria-hidden="true">●</span>
+            <span class="mic-ripple"></span>
+          </button>
+          <button
+            type="submit"
+            class="send-button"
+            id="sendButton"
+            disabled
+            aria-label="Send question"
+          >
+            <span aria-hidden="true">➤</span>
+          </button>
+        </form>
+        <div class="dock-caption">
+          <span>✓ Knowledge files are processed locally</span>
+          <span>Browser speech may use your browser provider</span>
+        </div>
+      </section>
+
+      <button
+        class="drawer-backdrop"
+        id="drawerBackdrop"
+        aria-label="Close panel"
+        hidden
+      ></button>
+      <aside class="drawer" id="drawer" role="dialog" aria-modal="true" hidden>
+        <div class="drawer-header">
+          <span>
+            <span id="drawerIcon" aria-hidden="true">▤</span>
+            <strong id="drawerTitle">Knowledge studio</strong>
+          </span>
+          <button id="closeDrawer" aria-label="Close panel">×</button>
+        </div>
+
+        <div class="drawer-content knowledge-studio" id="knowledgePanel" hidden>
+          <div class="privacy-note">
+            <span aria-hidden="true">✓</span>
+            <span>
+              <strong>Private by default</strong>
+              Your text is indexed in this browser tab and is not uploaded by
+              Hushlearn.
+            </span>
+          </div>
+          <label>
+            Knowledge name
+            <input id="kbName" placeholder="e.g. Civil procedure notes" />
+          </label>
+          <div class="sample-label">START WITH A SAMPLE</div>
+          <div class="sample-grid" id="sampleGrid"></div>
+          <div class="upload-row">
+            <button id="uploadButton" type="button">
+              <span aria-hidden="true">⇧</span>
+              Upload local files
+            </button>
+            <span>TXT, MD, CSV, JSON, HTML · 5 MB each</span>
+            <input
+              id="fileInput"
+              hidden
+              multiple
+              type="file"
+              accept=".txt,.md,.csv,.json,.html"
+            />
+          </div>
+          <label class="knowledge-textarea">
+            Paste or edit knowledge
+            <textarea
+              id="kbText"
+              placeholder="Paste the source material Mira should use…"
+            ></textarea>
+            <span id="kbStats"></span>
+          </label>
+          <button class="primary-action" id="saveKnowledge">
+            <span aria-hidden="true">✦</span>
+            Let Mira study this
+          </button>
+        </div>
+
+        <div class="drawer-content source-list" id="sourcesPanel" hidden>
+          <p class="drawer-intro">
+            These are the passages used for the latest response. Hushlearn does
+            not invent a response when no passage matches.
+          </p>
+          <div id="sourceList"></div>
+        </div>
+
+        <div class="drawer-content settings-list" id="settingsPanel" hidden>
+          <section>
+            <div class="setting-heading">
+              <span aria-hidden="true">◴</span>
+              <span>
+                <strong>Energy mode</strong>
+                <small>Changes the pace of spoken answers</small>
+              </span>
+            </div>
+            <div class="segmented" id="energySegments">
+              <button data-energy="drained">Drained</button>
+              <button data-energy="steady" class="active">Steady</button>
+              <button data-energy="focused">Focused</button>
+            </div>
+          </section>
+          <section>
+            <div class="setting-heading">
+              <span aria-hidden="true">◖</span>
+              <span>
+                <strong>Speaking language</strong>
+                <small>Uses a matching voice installed in your browser</small>
+              </span>
+            </div>
+            <select id="languageSelect">
+              <option value="en-US">English (US)</option>
+              <option value="en-GB">English (UK)</option>
+              <option value="zh-HK">廣東話（香港）</option>
+              <option value="zh-TW">國語（繁體）</option>
+            </select>
+          </section>
+          <section>
+            <div class="setting-heading">
+              <span aria-hidden="true">≋</span>
+              <span>
+                <strong>Brown-noise room tone</strong>
+                <small>Generated locally with Web Audio</small>
+              </span>
+              <button class="switch" id="noiseSwitch" aria-label="Toggle brown noise">
+                <span></span>
+              </button>
+            </div>
+            <input
+              class="volume-slider"
+              id="volumeSlider"
+              type="range"
+              min="0.015"
+              max="0.16"
+              step="0.005"
+              value="0.08"
+              aria-label="Brown noise volume"
+            />
+          </section>
+          <section>
+            <div class="setting-heading">
+              <span aria-hidden="true">◉</span>
+              <span>
+                <strong>Text-only quiet mode</strong>
+                <small>Stops Mira from speaking automatically</small>
+              </span>
+              <button class="switch" id="quietSwitch" aria-label="Toggle quiet mode">
+                <span></span>
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="drawer-content about-panel" id="aboutPanel" hidden>
+          <span class="about-mark">☾</span>
+          <h2>Learning at the speed of a tired mind.</h2>
+          <p>
+            Hushlearn is a browser-first prototype: a calm digital educator
+            grounded in material you select. The free build uses local retrieval,
+            browser speech, and subtle portrait animation.
+          </p>
+          <div class="capability-list">
+            <span>✓ Typed and microphone questions</span>
+            <span>✓ Source-grounded responses</span>
+            <span>✓ Interruptible spoken answers</span>
+            <span>✓ No API key required</span>
+          </div>
+          <div class="reality-note">
+            <span aria-hidden="true">ⓘ</span>
+            <p>
+              This free demo animates a still original portrait. True
+              frame-by-frame lip synchronization requires the optional GPU adapter
+              described in the project documentation.
+            </p>
+          </div>
+        </div>
+      </aside>
+    </main>
+    <script type="module" src="./static-app.js"></script>
+  </body>
+</html>
