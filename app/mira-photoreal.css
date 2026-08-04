@@ -1,0 +1,90 @@
+/* Photoreal presentation overrides for the real-time Mira stage.
+ * Mira is a fictional adult AI educator, not a copy of a real individual.
+ */
+
+.mira-3d {
+  width: min(70vw, 1180px);
+  background:
+    radial-gradient(circle at 66% 30%, rgba(255, 221, 198, 0.14), transparent 27%),
+    radial-gradient(circle at 82% 46%, rgba(130, 177, 194, 0.12), transparent 38%),
+    linear-gradient(145deg, #172026 0%, #0b141b 48%, #071019 100%);
+  filter: saturate(0.98) contrast(1.045) brightness(1.015);
+  transform: translateZ(0);
+  will-change: opacity, filter;
+}
+
+.mira-3d.ready {
+  opacity: 1;
+}
+
+.mira-3d[data-avatar-mode="open-source-realistic"] canvas,
+.mira-3d[data-avatar-mode="custom"] canvas {
+  filter: drop-shadow(0 34px 52px rgba(0, 0, 0, 0.26));
+}
+
+.host-scene::before {
+  position: absolute;
+  z-index: 4;
+  right: clamp(22px, 3.6vw, 64px);
+  bottom: clamp(104px, 12vh, 150px);
+  min-width: 196px;
+  padding: 10px 13px;
+  border: 1px solid rgba(235, 244, 241, 0.18);
+  border-radius: 14px;
+  content: "FICTIONAL AI EDUCATOR\A Adult · 25 · Hong Kong-inspired design";
+  white-space: pre;
+  background: rgba(5, 13, 18, 0.54);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.22);
+  color: rgba(239, 247, 245, 0.9);
+  font-size: 10px;
+  font-weight: 620;
+  line-height: 1.55;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+  backdrop-filter: blur(18px) saturate(1.12);
+  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+}
+
+.host-scene::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(2, 8, 13, 0.58), transparent 52%),
+    radial-gradient(circle at 79% 39%, transparent 28%, rgba(1, 7, 11, 0.18) 72%);
+  mix-blend-mode: multiply;
+}
+
+.is-listening .mira-3d,
+.is-speaking .mira-3d {
+  filter: saturate(1.01) contrast(1.045) brightness(1.035);
+}
+
+@media (max-width: 900px) {
+  .mira-3d {
+    inset: 0;
+    width: 100%;
+    background:
+      radial-gradient(circle at 58% 25%, rgba(255, 221, 198, 0.13), transparent 28%),
+      linear-gradient(160deg, #172026 0%, #09131a 62%, #071019 100%);
+  }
+
+  .host-scene::before {
+    right: 16px;
+    bottom: 112px;
+    min-width: 0;
+    max-width: calc(100vw - 32px);
+    padding: 8px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mira-3d,
+  .host-light {
+    transition: opacity 180ms linear;
+    animation: none !important;
+  }
+}
