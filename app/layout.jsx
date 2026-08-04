@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./mira-photoreal.css";
 
 export const metadata = {
   title: "Hushlearn — quiet knowledge, spoken gently",
